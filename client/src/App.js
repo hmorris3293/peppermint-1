@@ -49,7 +49,7 @@ const Routing = () => {
               <Route path="/settings" component={Settings} />
               <Route path="/history" component={History} />
               <Route path="/notebook" component={NoteBook} />
-              <Route path="/status-page" component={Status} />
+              <Route path="/monitoring" component={Status} />
               <Route exact path="/tickets" component={Tickets} />
               <Route exact path="/tickets/:id" component={Detail} />
               <Route path="/admin/:path?">

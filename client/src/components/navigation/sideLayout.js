@@ -50,6 +50,12 @@ export default function SideLayout({ children }) {
       href: "/notebook",
       icon: FolderIcon,
       current: location.pathname === "/notebook" ? true : false,
+    },
+    {
+      name: "Monitoring",
+      href: "/monitoring",
+      icon: DesktopComputerIcon,
+      current: location.pathname === "/monitoring" ? true : false,
     }
   ];
 

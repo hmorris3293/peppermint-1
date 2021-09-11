@@ -1,6 +1,7 @@
 // TODO models in Prisma do not have same fields as Mongoose models
 const { prisma } = require("../../prisma/prisma");
-const fs = require("fs");
+const fs = require('fs');
+const AWS = require('aws-sdk');
 
 const doesTicketExist = async (id) => {
   const exists = await prisma.ticket
