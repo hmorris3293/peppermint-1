@@ -17,7 +17,7 @@ const osutils = require("os-utils");
 const os = require("os");
 const compression = require("compression");
 const { prisma } = require("./prisma/prisma");
-const Ping = require("ping-monitor");
+const Monitor = require("ping-monitor");
 
 require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
@@ -41,6 +41,8 @@ const note = require("./src/routes/notes");
 const client = require("./src/routes/client");
 const news = require("./src/routes/news");
 const uptime = require("./src/routes/uptime");
+const { Ping } = require("./src/controller/uptime/ping");
+const { error } = require("console");
 // const times = require("./src/routes/time");
 
 // Express server libraries
@@ -103,110 +105,123 @@ const server = app.listen(
   )
 );
 
-console.log(process.env.DATABASE_URL)
-
 // Set up socket.io
 const io = socket(server);
-let online = 0;
+// let online = 0;
 
-function convert(file) {
-  return new Promise((resolve, reject) => {
-    const stream = fs.createReadStream(file);
-    // Handle stream error (IE: file not found)
-    stream.on("error", reject);
+// function convert(file) {
+//   return new Promise((resolve, reject) => {
+//     const stream = fs.createReadStream(file);
+//     // Handle stream error (IE: file not found)
+//     stream.on("error", reject);
 
-    const reader = readline.createInterface({
-      input: stream,
-    });
+//     const reader = readline.createInterface({
+//       input: stream,
+//     });
 
-    const array = [];
+//     const array = [];
 
-    reader.on("line", (line) => {
-      array.push(line);
-    });
+//     reader.on("line", (line) => {
+//       array.push(line);
+//     });
 
-    reader.on("close", () => resolve(array));
-  });
-}
+//     reader.on("close", () => resolve(array));
+//   });
+// }
 
-function stats() {
-  let system = osutils.platform();
-  let cpu = osutils.cpuCount();
-  let cpuUse = osutils.cpuUsage(function (v) {
-    cpuUse = v;
-  });
-  let loadAverage = osutils.loadavg(5).toFixed(2);
-  let totalMem = osutils.totalmem().toFixed(2);
-  let freeMem = osutils.freemem().toFixed(2);
-  let freeMemPercentage = osutils.freememPercentage().toFixed(2);
-  let uptime = new Date(os.uptime() * 1000).toISOString().substr(11, 8);
+// function stats() {
+//   let system = osutils.platform();
+//   let cpu = osutils.cpuCount();
+//   let cpuUse = osutils.cpuUsage(function (v) {
+//     cpuUse = v;
+//   });
+//   let loadAverage = osutils.loadavg(5).toFixed(2);
+//   let totalMem = osutils.totalmem().toFixed(2);
+//   let freeMem = osutils.freemem().toFixed(2);
+//   let freeMemPercentage = osutils.freememPercentage().toFixed(2);
+//   let uptime = new Date(os.uptime() * 1000).toISOString().substr(11, 8);
 
-  io.emit("stats", {
-    system,
-    cpu,
-    loadAverage,
-    totalMem,
-    freeMem,
-    freeMemPercentage,
-    uptime,
-    cpuUse,
-  });
-}
+//   io.emit("stats", {
+//     system,
+//     cpu,
+//     loadAverage,
+//     totalMem,
+//     freeMem,
+//     freeMemPercentage,
+//     uptime,
+//     cpuUse,
+//   });
+// }
 
-setInterval(stats, 1000);
 
-async function startAll() {
-  const monitors = await prisma.monitor.findMany();
-
-  // console.log(monitors)
-
-  monitors.forEach(function (website) {
-    let monitor = new Ping({
-      website: website.url,
-      interval: 20,
-    });
-
-    monitor.on("up", function (res) {
-      console.log("Yay!! " + res.website + " is up.");
-    });
-
-    io.emit("startmonitor", "Up");
-  });
-}
-
-io.on("connection", async (socket) => {
-  online++;
-  console.log(`Socket ${socket.id} connected.`);
-  console.log(`Online: ${online}`);
-  io.emit("visitor enters", online);
-
-  stats();
-  startAll();
-
-  convert("./api.txt").then((res) => {
-    io.emit("file", res);
-  });
-
-  socket.on("disconnect", () => {
-    online--;
-    console.log(`Socket ${socket.id} disconnected.`);
-    console.log(`Online: ${online}`);
-    io.emit("visitor exits", online);
-  });
-});
-
-io.on("startmonitor", async (socket, callback) => {
+// todo -> save updates in postgres or use websockets? 
+async function monitors() {
   try {
-    await startAll();
+    const monitors = await prisma.monitor.findMany();
 
-    callback({
-      ok: true,
-      msg: "Started Successfully",
-    });
-  } catch (e) {
-    callback({
-      ok: false,
-      msg: e.message,
-    });
+    for (let i in monitors) {
+      const myWebsite = new Monitor({
+        website: "https://www.google.com/",
+        interval: 1,
+
+        expect: {
+          statusCode: 200,
+        },
+      });
+
+      myWebsite.on("up", function (response, state) {
+        console.log(
+          "Yay!! " +
+            response.website +
+            " is up with a res time of of " +
+            response.responseTime +
+            "ms"
+        );
+      });
+
+      myWebsite.on("down", function (res) {
+        console.log(
+          "Oh Snap!! " + res.website + " is down! " + res.statusMessage
+        );
+      });
+
+      myWebsite.on("stop", function (website) {
+        console.log(website + " monitor has stopped.");
+      });
+
+      myWebsite.on("error", function (error) {
+        console.log(error);
+      });
+    }
+
+    io.emit("data");
+  } catch (error) {
+    console.log(error);
   }
+}
+
+io.on("connection", (socket) => {
+  console.log(`Socket ${socket.id} connected.`);
+  monitors();
 });
+
+// io.on("connection", async (socket) => {
+//   online++;
+//   console.log(`Socket ${socket.id} connected.`);
+//   console.log(`Online: ${online}`);
+//   io.emit("visitor enters", online);
+
+//   stats();
+//   startAll();
+
+//   convert("./api.txt").then((res) => {
+//     io.emit("file", res);
+//   });
+
+//   socket.on("disconnect", () => {
+//     online--;
+//     console.log(`Socket ${socket.id} disconnected.`);
+//     console.log(`Online: ${online}`);
+//     io.emit("visitor exits", online);
+//   });
+// });

@@ -60,10 +60,10 @@ export default function SideLayout({ children }) {
   ];
 
   const secondaryNavigation = [
-    {
-      name: "Dashboard",
-      href: "/admin/dashboard",
-    },
+    // {
+    //   name: "Dashboard",
+    //   href: "/admin/dashboard",
+    // },
     { name: "Clients", href: "/admin/clients" },
     { name: "Internal Users", href: "/admin/internal" },
   ];
@@ -130,7 +130,7 @@ export default function SideLayout({ children }) {
                       href={item.href}
                       className={classNames(
                         item.current
-                          ? "bg-green-500 text-white"
+                          ? "bg-green-500 text-white hover:text-white"
                           : "text-white hover:bg-green-400 hover:text-white",
                         "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                       )}

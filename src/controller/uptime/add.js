@@ -2,17 +2,16 @@ const { prisma } = require("../../../prisma/prisma");
 
 exports.Add = async (req, res) => {
   try {
-    console.log(req.body);
-    const { name, address, port } = req.body;
+    const { name, address, port, active } = req.body;
     const monitor = await prisma.monitor.create({
       data: {
         name,
-        address,
+        url: address,
         port: Number(port),
-        Active: true,
+        Active: active,
       },
     });
-    console.log(monitor);
+    
     res.status(200).json({ monitor, sucess: true });
   } catch (error) {
     console.log(error);

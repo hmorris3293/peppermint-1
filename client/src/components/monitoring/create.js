@@ -8,9 +8,27 @@ function classNames(...classes) {
 
 const Create = () => {
   const [open, setOpen] = useState(false);
+  const cancelButtonRef = useRef(null);
+
+  const [name, setName] = useState("")
+  const [address, setAddress] = useState("")
+  const [port, setPort] = useState("")
   const [enabled, setEnabled] = useState(true);
 
-  const cancelButtonRef = useRef(null);
+  async function addMonitor() {
+    await fetch("api/v1/uptime/add", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        address,
+        port,
+        active: enabled
+      })
+    })
+  }
 
   return (
     <div>
@@ -89,6 +107,7 @@ const Create = () => {
                           id="name"
                           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                           placeholder="peppermint home page"
+                          onChange={(e) => setName(e.target.value)}
                         />
                       </div>
 
@@ -105,6 +124,7 @@ const Create = () => {
                           id="address"
                           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                           placeholder="213.168.248.197"
+                          onChange={(e) => setAddress(e.target.value)}
                         />
                       </div>
 
@@ -120,7 +140,8 @@ const Create = () => {
                           name="email"
                           id="email"
                           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          placeholder="you@example.com"
+                          placeholder="443"
+                          onChange={(e) => setPort(e.target.value)}
                         />
                       </div>
 
@@ -156,7 +177,10 @@ const Create = () => {
                   <button
                     type="button"
                     className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:w-auto sm:text-sm"
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      setOpen(false)
+                      addMonitor()
+                    }}
                   >
                     Add
                   </button>

@@ -3,7 +3,7 @@ import { HotKeys } from "react-hotkeys";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "antd/dist/antd.css";
 import "./App.css";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import { Spin } from "antd";
 
 const Home = React.lazy(() => import("./pages/Home"));
@@ -68,14 +68,14 @@ const Routing = () => {
 };
 
 const App = () => {
-  useEffect(() => {
-    async function soc() {
-      const socket = await io.connect("/");
-      socket.once("visitor enters", () => console.log(socket.id));
-      socket.once("visitor exits", () => socket.disconnect());
-    }
-    soc();
-  }, []);
+  // useEffect(() => {
+  //   async function soc() {
+  //     const socket = await io.connect("/");
+  //     socket.once("visitor enters", () => console.log(socket.id));
+  //     socket.once("visitor exits", () => socket.disconnect());
+  //   }
+  //   soc();
+  // }, []);
 
   return (
     <div>
