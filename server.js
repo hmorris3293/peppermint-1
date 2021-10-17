@@ -153,23 +153,22 @@ const io = socket(server);
 //   });
 // }
 
-
-// todo -> save updates in postgres or use websockets? 
+// todo -> save updates in postgres or use websockets?
 async function monitors() {
   try {
     const monitors = await prisma.monitor.findMany();
 
-    for (let i in monitors) {
+    monitors.forEach((monitor) => {
       const myWebsite = new Monitor({
-        website: "https://www.google.com/",
-        interval: 1,
+        website: monitor.url,
+        interval: monitor.interval,
 
         expect: {
           statusCode: 200,
         },
       });
 
-      myWebsite.on("up", function (response, state) {
+      myWebsite.on("up", async function (response, state) {
         console.log(
           "Yay!! " +
             response.website +
@@ -177,12 +176,34 @@ async function monitors() {
             response.responseTime +
             "ms"
         );
+
+        await prisma.monitor.update({
+          where: {
+            id: monitor.id
+          }, 
+          data: {
+            res: String(response.responseTime),
+            up: true
+          }
+        })
+        
       });
 
-      myWebsite.on("down", function (res) {
+      myWebsite.on("down", async function (res) {
         console.log(
           "Oh Snap!! " + res.website + " is down! " + res.statusMessage
         );
+
+        await prisma.monitor.update({
+          where: {
+            id: monitor.id
+          }, 
+          data: {
+            res: null,
+            up: false
+          }
+        })
+
       });
 
       myWebsite.on("stop", function (website) {
@@ -192,9 +213,11 @@ async function monitors() {
       myWebsite.on("error", function (error) {
         console.log(error);
       });
-    }
+    });
 
-    io.emit("data");
+    console.log(monitors)
+
+    io.emit("data", monitors);
   } catch (error) {
     console.log(error);
   }

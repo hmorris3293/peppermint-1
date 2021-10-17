@@ -9,6 +9,8 @@ exports.Add = async (req, res) => {
         url: address,
         port: Number(port),
         Active: active,
+        interval: 1,
+        up: true
       },
     });
     

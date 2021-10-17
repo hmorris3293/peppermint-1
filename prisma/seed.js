@@ -13,7 +13,7 @@ async function main() {
       password: "$2b$10$BFmibvOW7FtY0soAAwujoO9y2tIyB7WEJ2HNq9O7zh9aeejMvRsKu",
     },
   });
-  
+
   const unkownClient = await prisma.client.upsert({
     where: { email: "unkown" },
     update: {},
@@ -21,9 +21,9 @@ async function main() {
       name: "unknown",
       email: "unknown",
       contactName: "unknown",
-      number: "12345678"
-    }
-  })
+      number: "12345678",
+    },
+  });
 
   const unkownUser = await prisma.user.upsert({
     where: { email: "unkown" },
@@ -34,9 +34,9 @@ async function main() {
       password: "unknown",
       email: "unknown",
       isAdmin: false,
-      password: String(Math.floor(Math.random() * 1000))
-    }
-  })
+      password: String(Math.floor(Math.random() * 1000)),
+    },
+  });
 
   const internal = await prisma.client.upsert({
     where: { email: `internal@admin.com` },
@@ -45,11 +45,25 @@ async function main() {
       email: `internal@admin.com`,
       name: "internal",
       contactName: "admin",
-      number: '123456789',
+      number: "123456789",
     },
-  })
+  });
 
-  console.log({ admin, internal, unkownClient, unkownUser });
+  const website = await prisma.monitor.upsert({
+    where: { id: Number(1) },
+    update: {},
+    create: {
+      name: "google",
+      url: "https://www.google.com/",
+      port: Number(433),
+      Active: true,
+      up: true,
+      res: null,
+      interval: Number(1)
+    },
+  });
+
+  console.log({ admin, internal, unkownClient, unkownUser, website });
 }
 
 main()

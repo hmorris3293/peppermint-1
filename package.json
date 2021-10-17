@@ -1,7 +1,7 @@
 {
   "name": "project",
   "version": "0.1.5",
-  "description": "Ticket system",
+  "description": "Peppermint Ticket system",
   "main": "server.js",
   "bin": {
     "project": "server.js"
@@ -21,7 +21,7 @@
     ]
   },
   "scripts": {
-    "seed": "prisma db seed --preview-feature",
+    "seed": "node prisma/seed.js",
     "migrate-dev": "prisma migrate dev --preview-feature",
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",
@@ -29,7 +29,8 @@
     "server": "nodemon server",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\" --ignore client",
-    "docker": "npm run migrate && npm run generate && npm run seed && npm run server"
+    "docker": "npm run migrate && npm run generate && npm run seed && npm run server",
+    "setup": "npm run migrate && npm run generate && npm run seed"
   },
   "keywords": [],
   "author": "Jack Andrews",
@@ -64,6 +65,6 @@
   "devDependencies": {
     "concurrently": "^5.3.0",
     "nodemon": "^2.0.6",
-    "prisma": "^2.21.2"
+    "prisma": "^3.2.1"
   }
 }

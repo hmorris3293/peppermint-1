@@ -28,9 +28,9 @@ model User {
 }
 
 model Ticket {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now())
+  id         Int          @id @default(autoincrement())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now())
   name       String
   issue      String
   email      String
@@ -38,8 +38,8 @@ model Ticket {
   isIssued   Boolean
   isComplete Boolean
   priority   String
-  assignedTo User     @relation(fields: [userId], references: [id])
-  client     Client   @relation(fields: [clientId], references: [id])
+  assignedTo User         @relation(fields: [userId], references: [id])
+  client     Client       @relation(fields: [clientId], references: [id])
   clientId   Int
   userId     Int
   TicketFile TicketFile[]
@@ -107,11 +107,14 @@ model Todos {
 }
 
 model Monitor {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
-    name String
-    url String
-    port Int
-    Active Boolean
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  name      String
+  url       String
+  port      Int
+  Active    Boolean
+  res       String?
+  interval  Int?
+  up        Boolean?
 }
