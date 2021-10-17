@@ -32,11 +32,11 @@ const Status = () => {
         {data !== undefined && (
           <div className="p-8">
             <div class="flex mb-4 space-x-16">
-              <div class="w-1/4 h-full">
+              <div class="w-full h-full">
                 <div className="bg-gray-800 overflow-hidden shadow sm:rounded-xl">
                   <div className="px-4 py-5 sm:p-6 h-full spacey-y-8">
                     {data.map((monitor) => (
-                      <div className="flex flex-col sm:flex-row justify-between">
+                      <div className="flex flex-col sm:flex-row ">
                         <p
                           className={
                             monitor.up
@@ -46,14 +46,13 @@ const Status = () => {
                         >
                           {monitor.up ? "Alive" : "Down"}
                         </p>
-                        <h3 className="text-white">{monitor.name}</h3>
-                        <p className="text-white">{monitor.res}ms</p>
+                        <h3 className="text-white ml-4">{monitor.name}</h3>
+                        <p className="text-white ml-3">{monitor.res}ms</p>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <div class="w-3/4 bg-gray-500"></div>
             </div>
           </div>
         )}
